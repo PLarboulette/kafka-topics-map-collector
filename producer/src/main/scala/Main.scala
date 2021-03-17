@@ -1,8 +1,5 @@
-import models.{Hero, Town}
+import models.{Order, User}
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, ProducerRecord}
-import org.apache.kafka.common.header.Header
-import org.apache.kafka.common.header.internals.RecordHeader
-
 import java.util.{Properties, UUID}
 
 object Main extends App {
@@ -15,43 +12,31 @@ object Main extends App {
   props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "io.confluent.kafka.serializers.KafkaAvroSerializer")
   props.put("schema.registry.url", "http://127.0.0.1:8081")
 
-
-  def getHeaders: Iterable[Header] = List(
-    new RecordHeader("serviceName", "producer".getBytes),
-  )
-
   val producer = new KafkaProducer[String, AnyRef](props)
 
-  val heroTopic = "hero-topic"
-  val keyForHero = UUID.randomUUID().toString
-
-  val hero = Hero("Batman", 25, "Gotham city")
-  val producerRecordHero = new ProducerRecord[String, AnyRef](
-    heroTopic,
-    keyForHero,
-    Hero.recordFormat.to(hero),
-  )
-
-  val townTopic = "town-topic"
-  val keyForTown = UUID.randomUUID().toString
-
-  val town = Town("Metropolis")
-  val producerRecordTown = new ProducerRecord[String, AnyRef](
-    townTopic,
-    keyForTown,
-    Town.recordFormat.to(town),
+  val topic = "topic-order"
+  val order = Order(UUID.randomUUID(), UUID.randomUUID(), 30)
+  val producerRecord = new ProducerRecord[String, AnyRef](
+    topic,
+    Order.recordFormat.to(order)
   )
 
   val f = producer.send(
-    producerRecordHero
+    producerRecord
   ).get()
 
-  println(s"Offset : ${f.offset()}")
+  val topicUser = "topic-user"
+  val user = User(
+    UUID.randomUUID(),
+    "Gandalf"
+  )
+  val producerRecordUser = new ProducerRecord[String, AnyRef](
+    topicUser,
+    User.recordFormat.to(user)
+  )
 
   val f2 = producer.send(
-    producerRecordTown
+    producerRecordUser
   ).get()
-
-  println(s"Offset : ${f2.offset()}")
 
 }
