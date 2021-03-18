@@ -16,3 +16,9 @@ The goal is to generate a json file containing all the information, in a special
 
 In this project, I use some experiments I launched in other projects. 
 --> https://github.com/PLarboulette/kafka-avro-experiments
+
+# How to run 
+- `docker-compose up`
+- Launch the producer : `sbt "project producer" run`. It will create the topics 
+- Launch the consumer : `sbt "project consumer" run`. It will launch the two consumers and read the events 
+- Launch the collector : `sbt "project collector" run`. It will get the data from the different sources and construct the dependencies between topics, consumers and producers. 
